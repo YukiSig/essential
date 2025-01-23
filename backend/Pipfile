@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "==3.0.3"
+sqlalchemy = "==2.0.36"
+flask-sqlalchemy = "==3.1.1"
+mysqlclient = "==2.2.7"
+pynamodb = "==6.0.1"
+bcrypt = "==4.2.1"
+flask-cors = "==5.0.0"
+flask-jwt-extended = "==4.7.1"
+gunicorn = "==23.0.0"
+
+[dev-packages]
+black = "==24.10.0"
+flake8 = "==7.1.0"
+
+[scripts]
+"format" = "black ./"
+"format:check" = "black --check ./"
+"lint" = "flake8 ./"
+"typecheck" = "pyright"

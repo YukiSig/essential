@@ -1,0 +1,54 @@
+services:
+  frontend:
+    build:
+      context: ../frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    container_name: frontend
+
+  backend:
+    build:
+      context: ./
+    ports:
+      - "5001:5001"
+    environment:
+      DYNAMODB_ENDPOINT: http://dynamodb-local:8000
+      AWS_DEFAULT_REGION: ap-northeast-1
+      AWS_ACCESS_KEY_ID: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
+      ALLOWED_ORIGINS: http://localhost:3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: mini_zenn
+      DB_USER: admin
+      DB_PASSWORD: password
+    depends_on:
+      - mysql-db
+      - dynamodb-local
+    container_name: backend
+
+  mysql-db:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mini_zenn
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+
+  dynamodb-local:
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
+    ports:
+      - "9000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
