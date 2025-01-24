@@ -4,7 +4,6 @@ from flask import Flask, jsonify, request
 from db.rds import db, Users
 from bcrypt import checkpw
 from flask_jwt_extended import create_access_token
-from utils.init_db import ensure_table_exists
 
 log = getLogger(__name__)
 
@@ -20,8 +19,6 @@ def signin(app: Flask):
             return jsonify({"message": "Invalid request parameters"}), 400
 
         with app.app_context():
-            ensure_table_exists()
-
             user = db.session.query(Users).where(Users.email == email).first()
 
             if not user or not checkpw(

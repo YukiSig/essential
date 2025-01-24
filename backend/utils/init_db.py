@@ -1,8 +1,7 @@
 from logging import getLogger
 from flask import Flask
 from db.dynamodb import ArticleDetails
-from db.rds import db, Base, Config
-from sqlalchemy import create_engine
+from db.rds import db
 
 log = getLogger(__name__)
 
@@ -37,7 +36,3 @@ def ensure_dynamodb():
         log.info("create RDS Succeeded")
     except Exception as e:
         log.error(f"Init RDS Error: {e}")
-
-def ensure_table_exists():
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, echo=True)
-    Base.metadata.create_all(engine)
