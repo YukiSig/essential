@@ -9,6 +9,7 @@ import useSWRMutation from 'swr/mutation';
 import { redirect, useRouter } from 'next/navigation';
 import { useRecoilValue } from 'recoil';
 import { authState, userState } from '../state';
+import MessageDialog from '../../components/Modatal';
 
 type FormInput = {
   title: string;
@@ -54,6 +55,7 @@ export default function Detail(props: Props) {
   const [isPreview, setIsPreview] = useState<boolean>(false);
   const user = useRecoilValue(userState);
   const [isSelf, setIsSelf] = useState<boolean>(false);
+  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
 
   const fetcher = async (url: string, { arg }: { arg: FormInput }) =>
     await fetch(url, {
@@ -80,8 +82,44 @@ export default function Detail(props: Props) {
   const onClickPreview: MouseEventHandler<HTMLButtonElement> = () =>
     setIsPreview(!isPreview);
 
+  // 削除APIを実行する
+  const deleteFetcher = async (url: string, { arg }: { arg: undefined }) =>
+    await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${auth.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+  const { trigger: triggerDelete } = useSWRMutation(
+    `${process.env.NEXT_PUBLIC_API_URL}/posts/${props.params.id}`,
+    deleteFetcher,
+    {},
+  );
+
+  const onClickDelete: MouseEventHandler<HTMLButtonElement> = () =>
+    setIsOpenDialog(true);
+
+  const onSubmitDelete = () => {
+    triggerDelete().then(() => {
+      router.push('/');
+    });
+  };
+
   return (
     <main>
+      <MessageDialog
+        title="確認"
+        message="本当に削除しますか？"
+        open={isOpenDialog}
+        onPositive={() => onSubmitDelete()}
+        onNegative={() => {
+          setIsOpenDialog(false);
+        }}
+        labelPositive="削除する"
+      />
+
       <div className="mx-auto max-w-4xl px-4 pt-10">
         <div className="flex h-20 justify-between">
           <div className="flex w-9/12 items-center">
@@ -93,12 +131,20 @@ export default function Detail(props: Props) {
             />
           </div>
           {isSelf && (
-            <button
-              className={`my-auto h-10 rounded-lg ${isPreview ? 'bg-orange-300' : 'bg-slate-300'} px-4 hover:bg-slate-400`}
-              onClick={onClickPreview}
-            >
-              プレビュー
-            </button>
+            <div className="flex items-center justify-center">
+              <button
+                className="h-10 rounded-lg bg-red-300 px-4 hover:bg-red-400"
+                onClick={onClickDelete}
+              >
+                削除
+              </button>
+              <button
+                className={`my-auto ml-2 h-10 rounded-lg ${isPreview ? 'bg-orange-300' : 'bg-slate-300'} px-4 hover:bg-slate-400`}
+                onClick={onClickPreview}
+              >
+                プレビュー
+              </button>
+            </div>
           )}
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>

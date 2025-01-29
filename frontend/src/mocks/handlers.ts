@@ -1,5 +1,4 @@
 import { http, HttpResponse } from 'msw';
-import { title } from 'process';
 
 export const handlers = [
   http.get('api/posts', () => {
@@ -67,6 +66,10 @@ export const handlers = [
   }),
 
   http.put('api/posts/1', () => {
+    return HttpResponse.json();
+  }),
+
+  http.delete('api/posts/1', () => {
     return HttpResponse.json();
   }),
 

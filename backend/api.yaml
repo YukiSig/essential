@@ -142,6 +142,32 @@ paths:
           $ref: '#/components/responses/NotFoundError' 
         '500':
           $ref: '#/components/responses/InternalError' 
+    delete:
+      summary: Delete a specific article
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id 
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Article deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+        '400':
+          $ref: '#/components/responses/BadRequest' 
+        '401':
+          $ref: '#/components/responses/UnauthorizedError' 
+        '404':
+          $ref: '#/components/responses/NotFoundError' 
+        '500':
+          $ref: '#/components/responses/InternalError' 
   /signup:
     post:
       summary: Create a user 
