@@ -10,6 +10,7 @@ from api.create_article import create_article
 from api.get_articles import get_article_by_id
 from api.update_article import update_article
 from api.list_articles import list_articles
+from api.delete_article import delete_article_by_id
 from db.rds import Config, db
 from utils.init_db import init_dynamodb, init_rds
 
@@ -52,6 +53,11 @@ def get_article_by_id_end_point(id: int):
 @jwt_required()
 def update_article_endpoint(id: int):
     return update_article(app, id)
+
+@app.route("/posts/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_article_by_id_endpoint(id: int):
+    return delete_article_by_id(app, id)
 
 @app.cli.command("init-rds")
 def init_rds_endpoint():
