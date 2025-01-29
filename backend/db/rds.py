@@ -22,7 +22,7 @@ class Users(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    password: Mapped[str] = mapped_column(String(80), nullable=False)
+    password: Mapped[str] = mapped_column(String(60), nullable=False)
     email: Mapped[str] = mapped_column(String(50), nullable=False)
     created_at: Mapped[TIMESTAMP] = mapped_column(
         TIMESTAMP, server_default=func.now(), nullable=False
