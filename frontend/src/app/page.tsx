@@ -1,32 +1,46 @@
 'use client';
 import { HeartIcon } from '@heroicons/react/24/solid';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import useSWR from 'swr';
 import { authState, userState } from './state';
-import { MouseEventHandler, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default function Home() {
-  const auth = useRecoilValue(authState);
+  const [auth, setAuth] = useRecoilState(authState);
+  const [user, setUser] = useRecoilState(userState);
+
   useEffect(() => {
     if (!auth.token) {
       redirect('/login');
     }
   }, [auth]);
 
-  const fetcher = (url: string) =>
-    fetch(url, {
+  const fetcher = async (url: string) => {
+    const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${auth.token}`,
       },
-    }).then((res) => res.json());
+    });
+    if (res.status === 401) {
+      setAuth({ token: '' });
+      setUser({ id: '', name: '' });
+      redirect('/login');
+    }
+    return res.json();
+  };
 
   const { data, error, isLoading } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/posts`,
     fetcher,
     {
       fallbackData: [],
+      onError: (error) => {
+        if (error.message === 'Unauthorized') {
+          console.log('Unauthorized access, redirecting to login');
+        }
+      }
     },
   );
 
